@@ -8,19 +8,11 @@ on:
   workflow_dispatch:
   
 env:
-  AZ_RG_NAME: RG10
+  AZ_RG_NAME: RG11
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run linter on bicep file
-        run:  az bicep build --file storage.bicep
-
   deploy:
     runs-on: ubuntu-latest
-    needs: [lint]
     steps:
       - uses: actions/checkout@v3
       - name: Login to Azure
@@ -39,3 +31,11 @@ jobs:
           deploymentName: ${{github.run_number}}
           resourceGroupName: ${{env.AZ_RG_NAME}}
           template: ./storage.bicep
+      - name: Deploy Bicep file for container
+        uses: azure/arm-deploy@v1
+        id: deploy-sa-container
+        with:
+          deploymentName: ${{github.run_number}}
+          resourceGroupName: ${{env.AZ_RG_NAME}}
+          template: ./blobcontainer.bicep
+          parameters: mysaname=${{steps.deploy-sa.outputs.mysaname}}
