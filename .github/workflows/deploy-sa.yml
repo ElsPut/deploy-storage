@@ -15,4 +15,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run linter on bicep file
-        run: az bicep linter build --file storage.bicep
+        run:  az bicep build --file storage.bicep
